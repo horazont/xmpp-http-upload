@@ -1,5 +1,6 @@
 import contextlib
 import errno
+import fnmatch
 import json
 import hashlib
 import hmac
@@ -118,7 +119,7 @@ def put_file(path):
             with metadata_file.open("x") as f:
                 json.dump(
                     {
-                        "headers": {"Content-Type": content_type}
+                        "headers": {"Content-Type": content_type},
                     },
                     f,
                 )
@@ -144,6 +145,22 @@ def put_file(path):
     )
 
 
+def generate_headers(response_headers, metadata_headers):
+    for key, value in metadata_headers.items():
+        response_headers[key] = value
+
+    content_type = metadata_headers["Content-Type"]
+    for mimetype_glob in app.config.get("NON_ATTACHMENT_MIME_TYPES", []):
+        if fnmatch.fnmatch(content_type, mimetype_glob):
+            break
+    else:
+        response_headers["Content-Disposition"] = "attachment"
+
+    response_headers["X-Content-Type"] = "nosniff"
+    response_headers["X-Frame-Options"] = "DENY"
+    response_headers["Content-Security-Policy"] = "default-src 'none'; sandbox"
+
+
 @app.route("/<path:path>", methods=["HEAD"])
 def head_file(path):
     try:
@@ -162,8 +179,10 @@ def head_file(path):
 
     response = flask.Response()
     response.headers["Content-Length"] = str(stat.st_size)
-    for key, value in metadata["headers"].items():
-        response.headers[key] = value
+    generate_headers(
+        response.headers,
+        metadata["headers"],
+    )
     return response
 
 
@@ -184,6 +203,8 @@ def get_file(path):
     response = flask.make_response(flask.send_file(
         str(data_file),
     ))
-    for key, value in metadata["headers"].items():
-        response.headers[key] = value
+    generate_headers(
+        response.headers,
+        metadata["headers"],
+    )
     return response
