@@ -156,7 +156,7 @@ def generate_headers(response_headers, metadata_headers):
     else:
         response_headers["Content-Disposition"] = "attachment"
 
-    response_headers["X-Content-Type"] = "nosniff"
+    response_headers["X-Content-Type-Options"] = "nosniff"
     response_headers["X-Frame-Options"] = "DENY"
     response_headers["Content-Security-Policy"] = "default-src 'none'; sandbox"
 
