@@ -44,3 +44,4 @@ Issues, Bugs, Limitations
 =========================
 
 * This service **does not handle any kind of quota**.
+* The format in which the files are stored is **not** compatible with ``mod_http_upload`` -- so you'll lose all uploaded files when switching.
