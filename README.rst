@@ -21,6 +21,25 @@ The configuration file must contain the following keys:
 ``DATA_ROOT``
     Path to the directory where the service stores the uploaded files.
 
+``NON_ATTACHMENT_MIME_TYPES``
+    A list of string globs which specify the content types which are *not* sent
+    as attachment. Defaults to the empty list if not given.
+
+    Example use::
+
+        NON_ATTACHMENT_MIME_TYPES = [
+            "image/*",
+            "video/*",
+            "audio/*",
+            "text/plain",
+        ]
+
+    Everything which does not match any of the entries here will be sent with
+    ``Content-Disposition: attachment`` in order to prevent funny attacks.
+
+    It is not recommended to add things like ``text/html`` or ``*`` to this
+    list.
+
 Issues, Bugs, Limitations
 =========================
 
