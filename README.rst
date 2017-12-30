@@ -45,3 +45,36 @@ Issues, Bugs, Limitations
 
 * This service **does not handle any kind of quota**.
 * The format in which the files are stored is **not** compatible with ``mod_http_upload`` -- so you'll lose all uploaded files when switching.
+
+Example Installation instructions
+=================================
+
+Example instructions, adjust accordingly.
+
+I assume your webserver uses ``www-data`` as service account. If you have a different user update the systemd service and the permissions for the data directory.
+
+Clone and install::
+
+    git clone https://github.com/horazont/xmpp-http-upload
+    sudo mv xmpp-http-upload /opt/xmpp-http-upload
+    cd /opt/xmpp-http-upload
+    copy config.example.py config.py
+    sudo python3 setup.py install
+
+Edit ``config.py`` and change ``SECRET_KEY``. Be sure to only change between ``''``.
+
+Create the upload directory::
+
+    sudo mkdir /var/lib/xmpp-http-upload
+    sudo chown www-data.www-data /var/lib/xmpp-http-upload
+
+Enable systemd service::
+
+    sudo copy contrib/xmpp-http-upload.service /etc/systemd/system
+    sudo systemctl enable xmpp-http-upload.service
+    sudo systemctl start xmpp-http-upload.service
+
+Configure your webserver:
+
+As final step you need to point your external webserver to your xmpp-http-upload flask app.
+Check the ``contrib`` directory, there is an example for nginx there.
