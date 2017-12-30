@@ -1,0 +1,18 @@
+[Unit]
+Description=XMPP HTTP Upload Service
+
+[Service]
+Type=simple
+
+User=www-data
+Group=www-data
+
+Environment=FLASK_APP=/opt/xmpp-http-upload/xhu.py
+Environment=XMPP_HTTP_UPLOAD_CONFIG=/opt/xmpp-http-upload/config.py
+ExecStart=/usr/local/bin/flask run
+
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
