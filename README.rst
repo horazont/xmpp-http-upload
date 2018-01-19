@@ -49,7 +49,11 @@ Issues, Bugs, Limitations
 Example Installation instructions
 =================================
 
-Example instructions, adjust accordingly.
+Example instructions for debian based systems, if you don't use debian check your distributions repositories for the correct python3 flask package name.
+You probably also want to use something else then ``apt-get`` on non debian based distributions.
+
+In this example we will install the flask http server and proxy requests from an already installed and configured webserver (nginx) to the flask http server.
+It is also possible to run the python script with ``wsgi`` which should yield in better performance.
 
 I assume your webserver uses ``www-data`` as service account. If you have a different user update the systemd service and the permissions for the data directory.
 
@@ -59,7 +63,7 @@ Clone and install::
     sudo mv xmpp-http-upload /opt/xmpp-http-upload
     cd /opt/xmpp-http-upload
     copy config.example.py config.py
-    sudo python3 setup.py install
+    sudo apt-get install python3-flask
 
 Edit ``config.py`` and change ``SECRET_KEY``. Be sure to only change between ``''``.
 
@@ -78,3 +82,6 @@ Configure your webserver:
 
 As final step you need to point your external webserver to your xmpp-http-upload flask app.
 Check the ``contrib`` directory, there is an example for nginx there.
+=======
+* This blindly trusts the clients Content-Type. I don't think this is a major issue, because we also tell the browser to blindly trust the clients MIME type. This, in addition with forcing all but a white list of MIME types to be downloaded instead of shown inline, should provide safety against any type of XSS attacks.
+* I have no idea about web security. The headers I set may be subtly wrong and circumvent all security measures I intend this to have. Please double-check for yourself and report if you find anything amiss.
