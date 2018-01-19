@@ -9,7 +9,7 @@ Group=www-data
 
 Environment=FLASK_APP=/opt/xmpp-http-upload/xhu.py
 Environment=XMPP_HTTP_UPLOAD_CONFIG=/opt/xmpp-http-upload/config.py
-ExecStart=/usr/local/bin/flask run
+ExecStart=/usr/bin/flask run
 
 Restart=on-failure
 RestartSec=10
