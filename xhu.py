@@ -113,7 +113,7 @@ def put_file(path):
 
     verification_key = flask.request.args.get("v", "")
     length = int(flask.request.headers.get("Content-Length", 0))
-    hmac_input = (path + " " + str(length)).encode("ascii")
+    hmac_input = "{} {}".format(path, length).encode("utf-8")
     key = app.config["SECRET_KEY"]
     mac = hmac.new(key, hmac_input, hashlib.sha256)
     digest = mac.hexdigest()
