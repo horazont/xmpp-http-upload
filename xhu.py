@@ -34,6 +34,10 @@ app = flask.Flask("xmpp-http-upload")
 app.config.from_envvar("XMPP_HTTP_UPLOAD_CONFIG")
 application = app
 
+if app.config['ENABLE_CORS']:
+    from flask_cors import CORS
+    CORS(app)
+
 
 def sanitized_join(path: str, root: pathlib.Path) -> pathlib.Path:
     result = (root / path).absolute()
