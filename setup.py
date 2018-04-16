@@ -12,6 +12,7 @@ with open(os.path.join(here, "README.rst"), encoding="utf-8") as f:
 
 install_requires = [
     'flask~=0.12',
+    'flask-cors~=3.0.3',
 ]
 
 setup(
