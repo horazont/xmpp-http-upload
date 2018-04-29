@@ -179,7 +179,7 @@ def generate_headers(response_headers, metadata_headers):
 
     response_headers["X-Content-Type-Options"] = "nosniff"
     response_headers["X-Frame-Options"] = "DENY"
-    response_headers["Content-Security-Policy"] = "default-src 'none'; sandbox"
+    response_headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'; sandbox"
 
 
 @app.route("/<path:path>", methods=["HEAD"])
