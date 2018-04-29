@@ -40,6 +40,10 @@ The configuration file must contain the following keys:
     It is not recommended to add things like ``text/html`` or ``*`` to this
     list.
 
+``ENABLE_CORS``
+  Allow cross-origin access to all endpoints unconditionally. This is needed
+  to allow web clients to use the upload feature.
+
 Issues, Bugs, Limitations
 =========================
 
