@@ -69,7 +69,8 @@ Clone and install::
     sudo mv xmpp-http-upload /opt/xmpp-http-upload
     cd /opt/xmpp-http-upload
     copy config.example.py config.py
-    sudo apt-get install python3-flask
+    sudo apt-get install python3-pip
+    sudo python3 -m pip install --upgrade flask-cors
 
 Edit ``config.py`` and change ``SECRET_KEY``. Be sure to only change between ``''``.
 
