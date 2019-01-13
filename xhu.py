@@ -25,6 +25,7 @@ import fnmatch
 import hashlib
 import hmac
 import json
+import logging
 import os
 import pathlib
 import shutil
@@ -37,6 +38,13 @@ app = flask.Flask("xmpp-http-upload")
 app.config.from_envvar("XMPP_HTTP_UPLOAD_CONFIG")
 application = app
 
+if app.config['LOGDIR']:
+    logging.basicConfig(
+        filename='{}/xhu.log'.format(app.config['LOGDIR']),
+        filemode='a',
+        level=logging.INFO
+    )
+logger = logging.getLogger(__name__)
 
 if app.config['ENABLE_CORS']:
     from flask_cors import CORS
@@ -99,6 +107,10 @@ def apply_quota(root: pathlib.Path, quota: int):
         file_list.sort(key=lambda a: a[0])
         while (bytes >= 0):
             modified, path, name, size = file_list.pop()
+            logger.info(
+                "Removing file {}/{} to maintain quota of {}"
+                .format(path, name, quota)
+            )
             shutil.rmtree(path)
             bytes -= size
 
