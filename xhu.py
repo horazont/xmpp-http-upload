@@ -22,10 +22,13 @@
 import contextlib
 import errno
 import fnmatch
-import json
 import hashlib
 import hmac
+import json
+import os
 import pathlib
+import shutil
+import stat
 import typing
 
 import flask
@@ -33,6 +36,7 @@ import flask
 app = flask.Flask("xmpp-http-upload")
 app.config.from_envvar("XMPP_HTTP_UPLOAD_CONFIG")
 application = app
+
 
 if app.config['ENABLE_CORS']:
     from flask_cors import CORS
@@ -49,7 +53,6 @@ def sanitized_join(path: str, root: pathlib.Path) -> pathlib.Path:
 def get_paths(base_path: pathlib.Path):
     data_file = pathlib.Path(str(base_path) + ".data")
     metadata_file = pathlib.Path(str(base_path) + ".meta")
-
     return data_file, metadata_file
 
 
@@ -65,10 +68,39 @@ def get_info(path: str, root: pathlib.Path) -> typing.Tuple[
         path,
         pathlib.Path(app.config["DATA_ROOT"]),
     )
-
     data_file, metadata_file = get_paths(dest_path)
-
     return data_file, load_metadata(metadata_file)
+
+
+def apply_quota(root: pathlib.Path, quota: int):
+    """ Get the files, sorted by last modification date and the sum of their
+        sizes.
+    """
+    if not quota:
+        return
+
+    file_list = []
+    total_size = 0
+    # We assume a file structure whereby files are are stored inside
+    # uuid() directories inside the root dir and that there aren't any files in
+    # the root dir itself.
+    for uuid_dir in os.listdir(root):
+        for path, dirnames, filenames in os.walk(root/uuid_dir):
+            for name in [n for n in filenames if n.endswith('.data')]:
+                fp = os.path.join(path, name)
+                size = os.path.getsize(fp)
+                total_size += size
+                modified = os.stat(fp)[stat.ST_MTIME]
+                file_list.append((modified, path, name, size))
+
+    bytes = total_size - quota
+    if (bytes > 0):
+        # Remove files (oldest first) until we're under our quota
+        file_list.sort(key=lambda a: a[0])
+        while (bytes >= 0):
+            modified, path, name, size = file_list.pop()
+            shutil.rmtree(path)
+            bytes -= size
 
 
 @contextlib.contextmanager
@@ -135,6 +167,11 @@ def put_file(path):
     )
 
     dest_path.parent.mkdir(parents=True, exist_ok=True, mode=0o770)
+
+    quota = flask.request.args.get("q", "")
+    if (quota):
+        apply_quota(dest_path.parent.parent, int(quota))
+
     data_file, metadata_file = get_paths(dest_path)
 
     try:
@@ -183,7 +220,8 @@ def generate_headers(response_headers, metadata_headers):
 
     response_headers["X-Content-Type-Options"] = "nosniff"
     response_headers["X-Frame-Options"] = "DENY"
-    response_headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'; sandbox"
+    response_headers["Content-Security-Policy"] = \
+        "default-src 'none'; frame-ancestors 'none'; sandbox"
 
 
 @app.route("/<path:path>", methods=["HEAD"])

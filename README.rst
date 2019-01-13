@@ -44,10 +44,22 @@ The configuration file must contain the following keys:
   Allow cross-origin access to all endpoints unconditionally. This is needed
   to allow web clients to use the upload feature.
 
+Setting an upload quota
+-----------------------
+
+A quota will be enforced if it's received from the XMPP server in the PUT
+request as a `q` URL parameter.
+
+The quota is enforced on the parent directory of the UUID directory containing
+the file and metadata.
+
+If this parent directory is global to all users, then the quota is also global,
+otherwise if this parent directory is specific to each user, then the quota is
+also per user.
+
 Issues, Bugs, Limitations
 =========================
 
-* This service **does not handle any kind of quota**.
 * The format in which the files are stored is **not** compatible with ``mod_http_upload`` -- so you'll lose all uploaded files when switching.
 * This blindly trusts the clients Content-Type. I don't think this is a major issue, because we also tell the browser to blindly trust the clients MIME type. This, in addition with forcing all but a white list of MIME types to be downloaded instead of shown inline, should provide safety against any type of XSS attacks.
 * I have no idea about web security. The headers I set may be subtly wrong and circumvent all security measures I intend this to have. Please double-check for yourself and report if you find anything amiss.
