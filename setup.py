@@ -40,4 +40,3 @@ setup(
     keywords="xmpp http",
     install_requires=install_requires,
 )
-
