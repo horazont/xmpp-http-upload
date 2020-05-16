@@ -18,6 +18,7 @@ install_requires = [
 setup(
     name="xmpp-http-upload",
     version="0.3.0",
+    packages=find_packages(),
     description="Flask-based HTTP service to handle XMPP HTTP upload requests from Prosody mod_http_upload_external",
     long_description=long_description,
     url="https://github.com/horazont/xmpp-http-upload",
