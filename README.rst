@@ -59,7 +59,8 @@ Example instructions for debian based systems, if you don't use debian check you
 You probably also want to use something else then ``apt-get`` on non debian based distributions.
 
 In this example we will install the flask http server and proxy requests from an already installed and configured webserver (nginx) to the flask http server.
-It is also possible to run the python script with ``wsgi`` which should yield in better performance.
+You should not use the flask http server in production.
+Instead, run the python script with ``wsgi`` which should yield in better performance and security.
 
 I assume your webserver uses ``www-data`` as service account. If you have a different user update the systemd service and the permissions for the data directory.
 
@@ -88,3 +89,14 @@ Configure your webserver:
 
 As final step you need to point your external webserver to your xmpp-http-upload flask app.
 Check the ``contrib`` directory, there is an example for nginx there.
+
+Uwsgi
+=================================
+
+Instead of setting up the systemd service as above, install uswgi and run the following commands using your service manager (systemd, openrc, etc.)::
+
+        cd /opt/xmpp-http-upload
+        export XMPP_HTTP_UPLOAD_CONFIG=/opt/xmpp-http-upload/config.py
+        uwsgi --plugins http,python --http 127.0.0.1:5002 --module xhu
+
+There is a example init script for openrc in the contrib folder.
