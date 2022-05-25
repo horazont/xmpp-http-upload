@@ -30,6 +30,7 @@ import typing
 
 import flask
 import werkzeug.exceptions
+import werkzeug.utils
 
 app = flask.Flask("xmpp-http-upload")
 app.config.from_envvar("XMPP_HTTP_UPLOAD_CONFIG")
@@ -42,7 +43,7 @@ if app.config['ENABLE_CORS']:
 
 def get_paths(root: str, sub_path: str) \
         -> typing.Tuple[pathlib.Path, pathlib.Path]:
-    base_path = flask.safe_join(root, sub_path)
+    base_path = werkzeug.utils.safe_join(root, sub_path)
     data_file = pathlib.Path(base_path + ".data")
     metadata_file = pathlib.Path(base_path + ".meta")
 
