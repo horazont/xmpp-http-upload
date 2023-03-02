@@ -1,0 +1,17 @@
+#!/sbin/openrc-run
+
+name=$RC_SVCNAME
+pidfile="/var/run/$RC_SVCNAME.pid"
+command_background="yes"
+command="/usr/sbin/uwsgi"
+command_args="--plugins http,python --http 127.0.0.1:5002 --module xhu"
+command_user="nginx:nginx"
+
+depend() {
+        after prosody
+}
+
+start_pre() {
+        cd /opt/xmpp-http-upload
+        export XMPP_HTTP_UPLOAD_CONFIG=/opt/xmpp-http-upload/config.py
+}
